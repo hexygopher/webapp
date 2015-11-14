@@ -1,24 +1,25 @@
 package main
-
 import (
     "net/http"
     "io/ioutil"
     "strings"
     "log"
+    "github.com/stumpyfr/udger"
 )
-
 type MyHandler struct {
+    u *udger.Udger
 }
-
 func (this *MyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
     path := r.URL.Path[1:]
-    agent := r.UserAgent()
-    
     if path == "" { path = "main.html" }
-
-    log.Println(strings.Split(r.RemoteAddr,":")[0] + " reqested", "/"+path, "\nagent: "+agent)
+    agent := r.UserAgent()
+    log.Println(strings.Split(r.RemoteAddr,":")[0] + " reqested", "/"+path)
+    ua, err := this.u.Lookup(agent)
+    if err != nil {
+        log.Println("error:", err)
+    }
+    log.Printf("%+v\n", ua)
     data, err := ioutil.ReadFile(string(path))
-    
     if err == nil {
         w.Write(data)
     } else {
@@ -27,8 +28,15 @@ func (this *MyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
         w.Write(data)
     }
 }
-
 func main() {
-    http.Handle("/", new(MyHandler))
-    http.ListenAndServe(":80", nil)
+    handler := new(MyHandler)
+    var err error
+    handler.u, err = udger.New("udgerdb.dat")
+    if err == nil {
+        log.Println("UdgerDB loaded successfully")   
+    } else {
+        log.Println("error:", err)
+    }
+    http.Handle("/", handler)
+    http.ListenAndServe(":8080", nil)
 }
