@@ -66,7 +66,7 @@ func main() {
 	}
 	
 	http.Handle("/", handler)
-	if err = http.ListenAndServe(fmt.Sprintf(":%d",*port), nil); err!=nil{
+	if err = http.ListenAndServe(fmt.Sprintf(":%d",*port), nil); err != nil{
 		log.Fatal(err)
 	}
 }
