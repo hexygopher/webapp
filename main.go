@@ -33,7 +33,7 @@ func (this *MyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 
 		form := r.PostForm
-		log.Println(strings.Split(r.RemoteAddr, ":")[0] + " reqested", "/" + path, "\ndevice:", device, "\nOS:", os, "\nBrowser:", browser, "\nUser-Agent: " + agent, fmt.Sprintf("\nForm=%v",form))
+		log.Println(strings.Split(r.RemoteAddr, ":")[0] + " reqested", "/" + path, "\ndevice:", device, "\nOS:", os, "\nBrowser:", browser, "\nUser-Agent: " + agent, fmt.Sprintf("\nForm=%v", form))
 
 	} else if r.Method == "GET" {
 		if path == "" {
