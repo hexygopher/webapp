@@ -13,18 +13,27 @@ type MyHandler struct {
 }
 
 func (this *MyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	path := r.URL.Path[1:]
-	if path == "" {
-		path = "main.html"
-	}
 	agent := r.UserAgent()
-	log.Println(strings.Split(r.RemoteAddr, ":")[0]+" reqested", "/"+path)
 	ua, err := this.u.Lookup(agent)
+	path := r.URL.Path[1:]
+	device := ua.Device.Name
+	os := ua.OS.Family
+	browser := ua.Browser.Name
+
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("%+v\n", ua)
+
+	if path == "" {
+		if device != "Smartphone" {
+			path = "index.html"
+		} else {
+			path = "m/index.html"
+		}
+	}
+
 	data, err := ioutil.ReadFile(string(path))
+	
 	if err == nil {
 		w.Write(data)
 	} else {
@@ -32,16 +41,22 @@ func (this *MyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(404)
 		w.Write(data)
 	}
+
+	log.Println(strings.Split(r.RemoteAddr, ":")[0]+" reqested", "/"+path, "\ndevice:", device, "\nOS:", os, "\nBrowser:", browser, "\nUser-Agent: "+agent)
+
 }
 func main() {
-	handler := new(MyHandler)
 	var err error
+
+	handler := new(MyHandler)
 	handler.u, err = udger.New("udgerdb.dat")
+	
 	if err == nil {
 		log.Println("UdgerDB loaded successfully")
 	} else {
 		log.Fatal(err)
 	}
+	
 	http.Handle("/", handler)
 	http.ListenAndServe(":8080", nil)
 }
