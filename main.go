@@ -6,7 +6,8 @@ import (
 	"log"
 	"net/http"
 	"strings"
-	"os"
+	"flag"
+	"fmt"
 )
 
 type MyHandler struct {
@@ -48,9 +49,8 @@ func (this *MyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 func main() {
 	var err error
-	if len(os.Args)!=2 {
-		log.Fatal("Syntax: ./main.go port")
-	}
+	port:=flag.Int("p", 8080, "port on which the server runs")
+	flag.Parse()
 	handler := new(MyHandler)
 	handler.u, err = udger.New("udgerdb.dat")
 	
@@ -61,5 +61,7 @@ func main() {
 	}
 	
 	http.Handle("/", handler)
-	http.ListenAndServe(":"+os.Args[1], nil)
+	if err=http.ListenAndServe(fmt.Sprintf(":%d",*port), nil); err!=nil{
+		log.Fatal(err)
+	}
 }
