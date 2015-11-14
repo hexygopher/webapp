@@ -17,11 +17,11 @@ type MyHandler struct {
 func (this *MyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	agent := r.UserAgent()
 	ua, err := this.u.Lookup(agent)
-	
+
 	if err != nil {
 		log.Fatal(err)
 	}
-	
+
 	path := r.URL.Path[1:]
 	device := ua.Device.Name
 	os := ua.OS.Family
@@ -45,7 +45,7 @@ func (this *MyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 
 		data, err := ioutil.ReadFile(string(path))
-		
+
 		if err == nil {
 			w.Write(data)
 		} else {
@@ -62,16 +62,16 @@ func main() {
 	port := flag.Int("p", 8080, "port on which the server runs")
 
 	flag.Parse()
-	
+
 	handler := new(MyHandler)
 	handler.u, err = udger.New("udgerdb.dat")
-	
+
 	if err == nil {
 		log.Println("UdgerDB loaded successfully")
 	} else {
 		log.Fatal(err)
 	}
-	
+
 	http.Handle("/", handler)
 
 	if err = http.ListenAndServe(fmt.Sprintf(":%d",*port), nil); err != nil{
