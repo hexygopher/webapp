@@ -49,7 +49,7 @@ func (this *MyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 func main() {
 	var err error
-	port:=flag.Int("p", 8080, "port on which the server runs")
+	port := flag.Int("p", 8080, "server port")
 	flag.Parse()
 	handler := new(MyHandler)
 	handler.u, err = udger.New("udgerdb.dat")
@@ -61,7 +61,7 @@ func main() {
 	}
 	
 	http.Handle("/", handler)
-	if err=http.ListenAndServe(fmt.Sprintf(":%d",*port), nil); err!=nil{
+	if err = http.ListenAndServe(fmt.Sprintf(":%d",*port), nil); err != nil{
 		log.Fatal(err)
 	}
 }
